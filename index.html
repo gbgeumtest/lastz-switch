@@ -16,11 +16,10 @@ h1{font-size:30px;margin-bottom:4px}.sub{color:#9ba6bc;margin-bottom:18px}
 .b{width:100%;border:0;border-radius:20px;padding:22px;margin:10px 0;color:#fff;font-size:22px;font-weight:800;text-align:left}
 .blue{background:#2467ff}.red{background:#ef3f4f}
 .card{background:#171d2c;border-radius:18px;padding:16px;margin:14px 0}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn,input,textarea,select{width:100%;box-sizing:border-box;border-radius:14px;padding:13px;font-size:16px}
+.btn,input{width:100%;box-sizing:border-box;border-radius:14px;padding:13px;font-size:16px}
 .btn{border:1px solid #36405a;background:#1c2435;color:#fff;font-weight:700}
-input,textarea,select{background:#0f1522;color:#fff;border:1px solid #36405a}
-.sm{font-size:13px;color:#9ba6bc}.code{font:800 34px ui-monospace,monospace}.hide{display:none}
+input{background:#0f1522;color:#fff;border:1px solid #36405a}
+.sm{font-size:13px;color:#9ba6bc;line-height:1.55}.ok{color:#69df91}.steps{line-height:1.7;margin:8px 0 0;padding-left:22px}
 </style>
 </head>
 <body>
@@ -28,94 +27,76 @@ input,textarea,select{background:#0f1522;color:#fff;border:1px solid #36405a}
 <h1>Last Z Quick Switch</h1>
 <div class="sub">본계 ↔ 부계 빠른 전환</div>
 
-<button class="b blue" onclick="go('main')">본계 전환 준비<div class="sm" id="m1"></div></button>
-<button class="b red" onclick="go('sub')">부계 전환 준비<div class="sm" id="m2"></div></button>
+<button class="b blue" onclick="go('main')">본계로 전환<div class="sm" id="m1"></div></button>
+<button class="b red" onclick="go('sub')">부계로 전환<div class="sm" id="m2"></div></button>
 
 <div class="card">
-  <div id="status">준비 완료</div>
-  <div id="ca" class="hide">
-    <div class="sm">최근 인증번호</div>
-    <div class="code" id="code"></div>
-    <button class="btn" onclick="copyCode()">인증번호 복사</button>
-  </div>
-</div>
-
-<div class="row">
-  <button class="btn" onclick="openMail()">📩 메일 열기</button>
-  <button class="btn" onclick="openGame()">🎮 Last Z 열기</button>
+  <b id="status">전환할 계정을 누르세요</b>
+  <div class="sm" id="detail" style="margin-top:7px">계정 이메일을 복사한 뒤 Last Z를 바로 엽니다.</div>
 </div>
 
 <div class="card">
-  <b>인증메일 내용 붙여넣기</b>
-  <p class="sm">메일 본문을 붙여넣으면 4~8자리 숫자 코드를 찾아 자동 복사합니다.</p>
-  <textarea id="txt" rows="5" placeholder="인증메일 내용을 붙여넣기"></textarea>
-  <button class="btn" style="margin-top:10px" onclick="findCode()">인증번호 자동 추출</button>
+  <b>게임에서 할 일</b>
+  <ol class="steps">
+    <li>프로필 → <b>계정</b></li>
+    <li><b>계정 전환</b> → <b>메일 계정으로 로그인</b></li>
+    <li>메일 주소 칸에 <b>붙여넣기</b> → 로그인</li>
+    <li>인증메일이 오면 자동화가 새 <b>6자리 인증번호</b>를 클립보드에 복사</li>
+    <li>인증번호 칸에 <b>붙여넣기</b> → 완료</li>
+  </ol>
+  <p class="sm ok">✓ 메일 앱을 직접 열어 인증번호를 확인할 필요 없음</p>
 </div>
 
+<button class="btn" onclick="openGame()">🎮 Last Z 다시 열기</button>
+
 <div class="card">
-  <b>설정</b>
-  <p class="sm">비밀번호는 저장하지 않습니다.</p>
-  <input id="main" placeholder="본계 이메일"><br><br>
-  <input id="sub" placeholder="부계 이메일"><br><br>
-  <select id="mail">
-    <option value="message://">Apple Mail</option>
-    <option value="googlegmail://">Gmail</option>
-    <option value="ms-outlook://">Outlook</option>
-  </select><br><br>
-  <input id="lastz" placeholder="Last Z 바로열기 주소(확인된 경우)"><br><br>
+  <b>계정 이메일 설정</b>
+  <p class="sm">이메일 주소만 이 기기에 저장합니다. 비밀번호는 저장하지 않습니다.</p>
+  <input id="main" type="email" autocomplete="off" placeholder="본계 이메일"><br><br>
+  <input id="sub" type="email" autocomplete="off" placeholder="부계 이메일"><br><br>
   <button class="btn" onclick="save()">저장</button>
 </div>
 
-<p class="sm">아이폰 Safari에서 열고 공유 → 홈 화면에 추가를 누르면 앱처럼 실행할 수 있습니다.</p>
+<p class="sm">인증번호는 매번 바뀝니다. iPhone 단축어의 Last Z 인증메일 자동화가 새 메일마다 최신 6자리 번호를 추출해 클립보드 값을 갱신합니다.</p>
 </div>
 
 <script>
-let c="";
 function mask(e){if(!e)return"이메일 미설정";let p=e.split("@");return p[0].slice(0,3)+"****@"+(p[1]||"")}
 function load(){
   document.getElementById("main").value=localStorage.main||"";
   document.getElementById("sub").value=localStorage.sub||"";
-  document.getElementById("mail").value=localStorage.mail||"message://";
-  document.getElementById("lastz").value=localStorage.lastz||"";
   document.getElementById("m1").textContent=mask(localStorage.main||"");
   document.getElementById("m2").textContent=mask(localStorage.sub||"");
 }
 function save(){
   localStorage.main=document.getElementById("main").value.trim();
   localStorage.sub=document.getElementById("sub").value.trim();
-  localStorage.mail=document.getElementById("mail").value;
-  localStorage.lastz=document.getElementById("lastz").value.trim();
-  load();document.getElementById("status").textContent="설정 저장 완료";
+  load();
+  document.getElementById("status").textContent="계정 이메일 저장 완료";
+  document.getElementById("detail").textContent="이제 본계/부계 버튼만 누르면 됩니다.";
 }
 async function cp(t){
   try{await navigator.clipboard.writeText(t)}
   catch(e){let a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}
 }
 async function go(k){
-  let e=k==="main"?localStorage.main:localStorage.sub;
-  if(!e){document.getElementById("status").textContent="이메일을 먼저 설정하세요.";return}
+  const label=k==="main"?"본계":"부계";
+  const e=k==="main"?localStorage.main:localStorage.sub;
+  if(!e){
+    document.getElementById("status").textContent=label+" 이메일 미설정";
+    document.getElementById("detail").textContent="아래 계정 이메일 설정에서 먼저 저장하세요.";
+    return;
+  }
   await cp(e);
-  document.getElementById("status").innerHTML=(k==="main"?"본계":"부계")+" 이메일 복사 완료<br>Last Z에서 <b>계정 → 계정 전환 → 붙여넣기</b>";
-  setTimeout(function(){
-    location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0";
-  },250);
+  document.getElementById("status").textContent=label+" 이메일 복사 완료";
+  document.getElementById("detail").textContent="Last Z 실행 중… 게임의 메일 주소 칸에서 붙여넣으세요.";
+  setTimeout(()=>location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0",250);
 }
-function openMail(){location.href=localStorage.mail||"message://"}
 function openGame(){
-  document.getElementById("status").textContent="Last Z 바로 여는 중";
+  document.getElementById("status").textContent="Last Z 실행 중…";
+  document.getElementById("detail").textContent="인증번호가 도착했다면 인증번호 칸에서 붙여넣으세요.";
   location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0";
 }
-async function findCode(){
-  let t=document.getElementById("txt").value;
-  let m=t.match(/(?<!\d)\d{6}(?!\d)/)||t.match(/(?<!\d)\d{4,8}(?!\d)/);
-  if(!m){document.getElementById("status").textContent="인증번호를 찾지 못했습니다.";return}
-  c=m[0];
-  document.getElementById("code").textContent=c;
-  document.getElementById("ca").classList.remove("hide");
-  await cp(c);
-  document.getElementById("status").textContent="인증번호 "+c+" 복사 완료";
-}
-async function copyCode(){if(c)await cp(c)}
 load();
 </script>
 </body></html>
