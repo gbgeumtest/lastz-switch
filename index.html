@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Last Z Switch">
+<title>Last Z Quick Switch</title>
+<style>
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0b1020;color:#fff}
+.w{max-width:520px;margin:auto;padding:24px}
+h1{font-size:30px;margin-bottom:4px}.sub{color:#9ba6bc;margin-bottom:18px}
+.b{width:100%;border:0;border-radius:20px;padding:22px;margin:10px 0;color:#fff;font-size:22px;font-weight:800;text-align:left}
+.blue{background:#2467ff}.red{background:#ef3f4f}
+.card{background:#171d2c;border-radius:18px;padding:16px;margin:14px 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn,input,textarea,select{width:100%;box-sizing:border-box;border-radius:14px;padding:13px;font-size:16px}
+.btn{border:1px solid #36405a;background:#1c2435;color:#fff;font-weight:700}
+input,textarea,select{background:#0f1522;color:#fff;border:1px solid #36405a}
+.sm{font-size:13px;color:#9ba6bc}.code{font:800 34px ui-monospace,monospace}.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Last Z Quick Switch</h1>
+<div class="sub">본계 ↔ 부계 빠른 전환</div>
+
+<button class="b blue" onclick="go('main')">본계 시작<div class="sm" id="m1"></div></button>
+<button class="b red" onclick="go('sub')">부계 시작<div class="sm" id="m2"></div></button>
+
+<div class="card">
+  <div id="status">준비 완료</div>
+  <div id="ca" class="hide">
+    <div class="sm">최근 인증번호</div>
+    <div class="code" id="code"></div>
+    <button class="btn" onclick="copyCode()">인증번호 복사</button>
+  </div>
+</div>
+
+<div class="row">
+  <button class="btn" onclick="openMail()">📩 메일 열기</button>
+  <button class="btn" onclick="openGame()">🎮 Last Z 열기</button>
+</div>
+
+<div class="card">
+  <b>인증메일 내용 붙여넣기</b>
+  <p class="sm">메일 본문을 붙여넣으면 4~8자리 숫자 코드를 찾아 자동 복사합니다.</p>
+  <textarea id="txt" rows="5" placeholder="인증메일 내용을 붙여넣기"></textarea>
+  <button class="btn" style="margin-top:10px" onclick="findCode()">인증번호 자동 추출</button>
+</div>
+
+<div class="card">
+  <b>설정</b>
+  <p class="sm">비밀번호는 저장하지 않습니다.</p>
+  <input id="main" placeholder="본계 이메일"><br><br>
+  <input id="sub" placeholder="부계 이메일"><br><br>
+  <select id="mail">
+    <option value="message://">Apple Mail</option>
+    <option value="googlegmail://">Gmail</option>
+    <option value="ms-outlook://">Outlook</option>
+  </select><br><br>
+  <input id="lastz" placeholder="Last Z 바로열기 주소(확인된 경우)"><br><br>
+  <button class="btn" onclick="save()">저장</button>
+</div>
+
+<p class="sm">아이폰 Safari에서 열고 공유 → 홈 화면에 추가를 누르면 앱처럼 실행할 수 있습니다.</p>
+</div>
+
+<script>
+let c="";
+function mask(e){if(!e)return"이메일 미설정";let p=e.split("@");return p[0].slice(0,3)+"****@"+(p[1]||"")}
+function load(){
+  document.getElementById("main").value=localStorage.main||"";
+  document.getElementById("sub").value=localStorage.sub||"";
+  document.getElementById("mail").value=localStorage.mail||"message://";
+  document.getElementById("lastz").value=localStorage.lastz||"";
+  document.getElementById("m1").textContent=mask(localStorage.main||"");
+  document.getElementById("m2").textContent=mask(localStorage.sub||"");
+}
+function save(){
+  localStorage.main=document.getElementById("main").value.trim();
+  localStorage.sub=document.getElementById("sub").value.trim();
+  localStorage.mail=document.getElementById("mail").value;
+  localStorage.lastz=document.getElementById("lastz").value.trim();
+  load();document.getElementById("status").textContent="설정 저장 완료";
+}
+async function cp(t){
+  try{await navigator.clipboard.writeText(t)}
+  catch(e){let a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}
+}
+async function go(k){
+  let e=k==="main"?localStorage.main:localStorage.sub;
+  if(!e){document.getElementById("status").textContent="이메일을 먼저 설정하세요.";return}
+  await cp(e);
+  document.getElementById("status").textContent=(k==="main"?"본계":"부계")+" 이메일 복사 완료";
+  if(localStorage.lastz)location.href=localStorage.lastz;
+}
+function openMail(){location.href=localStorage.mail||"message://"}
+function openGame(){
+  if(localStorage.lastz)location.href=localStorage.lastz;
+  else document.getElementById("status").textContent="Last Z 바로열기 주소 미설정";
+}
+async function findCode(){
+  let t=document.getElementById("txt").value;
+  let m=t.match(/(?<!\d)\d{6}(?!\d)/)||t.match(/(?<!\d)\d{4,8}(?!\d)/);
+  if(!m){document.getElementById("status").textContent="인증번호를 찾지 못했습니다.";return}
+  c=m[0];
+  document.getElementById("code").textContent=c;
+  document.getElementById("ca").classList.remove("hide");
+  await cp(c);
+  document.getElementById("status").textContent="인증번호 "+c+" 복사 완료";
+}
+async function copyCode(){if(c)await cp(c)}
+load();
+</script>
+</body></html>
