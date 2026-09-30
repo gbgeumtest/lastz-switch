@@ -51,10 +51,13 @@ input{background:#0f1522;color:#fff;border:1px solid #36405a}
 
 <div class="card">
   <b>계정 이메일 설정</b>
-  <p class="sm">이메일 주소만 이 기기의 브라우저 저장소에 보관합니다. 메일 비밀번호·네이버 앱 비밀번호·인증번호는 이 웹앱에 저장하지 않습니다.</p>
+  <p class="sm">본계/부계 이메일을 저장하고 메일 수신 준비 상태를 확인합니다. 일반 네이버 비밀번호는 입력받지 않습니다.</p>
   <input id="main" type="email" autocomplete="off" placeholder="본계 이메일"><br><br>
   <input id="sub" type="email" autocomplete="off" placeholder="부계 이메일"><br><br>
-  <button class="btn" onclick="save()">저장</button>
+  <button class="btn" onclick="save()">계정 저장</button>
+  <div style="height:10px"></div>
+  <button class="btn" onclick="mailConnectInfo()">📨 메일 연결 설정</button>
+  <p class="sm" id="mailState">메일 상태: 연결 확인 필요</p>
 </div>
 
 <div class="card">
@@ -103,10 +106,16 @@ async function go(k){
   document.getElementById("detail").textContent="Last Z 실행 중… 게임의 메일 주소 칸에서 붙여넣으세요.";
   setTimeout(()=>location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0",250);
 }
+function mailConnectInfo(){
+  document.getElementById("status").textContent="메일 연결이 필요합니다";
+  document.getElementById("detail").innerHTML="GB YS 웹앱은 네이버 비밀번호를 직접 받지 않습니다.<br>현재 버전에서는 iPhone Mail에 Naver 계정을 연결해야 인증메일 수신이 가능합니다.";
+  document.getElementById("mailState").textContent="메일 상태: Apple Mail의 Naver 계정 연결 필요";
+}
 function clearData(){
   if(!confirm("이 기기에 저장된 본계/부계 이메일을 삭제할까요?")) return;
   localStorage.removeItem("main");
   localStorage.removeItem("sub");
+  localStorage.removeItem("mailConnected");
   load();
   document.getElementById("status").textContent="내 정보 초기화 완료";
   document.getElementById("detail").textContent="저장된 이메일 주소를 삭제했습니다.";
