@@ -100,8 +100,8 @@ async function go(k){
 }
 function openMail(){location.href=localStorage.mail||"message://"}
 function openGame(){
-  document.getElementById("status").textContent="Last Z 공식 스토어 여는 중";
-  location.href="https://store.last-z.com/#/order";
+  document.getElementById("status").textContent="Last Z 바로 여는 중";
+  location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0";
 }
 async function findCode(){
   let t=document.getElementById("txt").value;
