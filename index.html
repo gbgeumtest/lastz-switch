@@ -95,8 +95,10 @@ async function go(k){
   let e=k==="main"?localStorage.main:localStorage.sub;
   if(!e){document.getElementById("status").textContent="이메일을 먼저 설정하세요.";return}
   await cp(e);
-  document.getElementById("status").textContent=(k==="main"?"본계":"부계")+" 이메일 복사 완료";
-  if(localStorage.lastz)location.href=localStorage.lastz;
+  document.getElementById("status").textContent=(k==="main"?"본계":"부계")+" 이메일 복사 완료 · Last Z 실행 중";
+  setTimeout(function(){
+    location.href="shortcuts://run-shortcut?name=Last%20Z%20%EC%97%B4%EA%B8%B0";
+  },250);
 }
 function openMail(){location.href=localStorage.mail||"message://"}
 function openGame(){
