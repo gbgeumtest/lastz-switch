@@ -100,8 +100,12 @@ async function go(k){
 }
 function openMail(){location.href=localStorage.mail||"message://"}
 function openGame(){
-  if(localStorage.lastz)location.href=localStorage.lastz;
-  else document.getElementById("status").textContent="Last Z 바로열기 주소 미설정";
+  if(localStorage.lastz){
+    location.href=localStorage.lastz;
+  }else{
+    document.getElementById("status").textContent="Last Z 공식 스토어에서 게임 열기";
+    location.href="https://store.last-z.com/#/order";
+  }
 }
 async function findCode(){
   let t=document.getElementById("txt").value;
