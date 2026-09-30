@@ -1,0 +1,8 @@
+{
+  "name": "Last Z Quick Switch",
+  "short_name": "Last Z Switch",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020"
+}
