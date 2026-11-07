@@ -1,0 +1,32 @@
+name: PC Scanner Windows EXE
+on:
+  push:
+    branches: [feature/lastz-pc-scanner]
+    paths:
+      - "pc-scanner/**"
+      - ".github/workflows/lastz-pc-scanner.yml"
+  pull_request:
+    paths:
+      - "pc-scanner/**"
+      - ".github/workflows/lastz-pc-scanner.yml"
+  workflow_dispatch:
+jobs:
+  windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r pc-scanner/requirements.txt pyinstaller
+      - name: Compile Python
+        run: python -m py_compile pc-scanner/lastz_scanner.py
+      - name: Build standalone EXE
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name LastZ-PC-Scanner pc-scanner/lastz_scanner.py
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: LastZ-PC-Scanner-Windows
+          path: dist/LastZ-PC-Scanner.exe
+          retention-days: 30
