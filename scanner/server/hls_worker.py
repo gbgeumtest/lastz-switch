@@ -18,7 +18,7 @@ def run():
     port = int(os.getenv("PORT", "8765"))
     interval = max(0.4, float(os.getenv("HLS_SAMPLE_SECONDS", "1.0")))
     parsed = urlparse(url)
-    if parsed.scheme != "https" or not parsed.hostname or not url.endswith(".m3u8"):
+    if parsed.scheme != "https" or not parsed.hostname or not parsed.path.endswith(".m3u8"):
         print("HLS bridge disabled: configure HTTPS HLS_PLAYBACK_URL ending .m3u8", flush=True)
         return
     if not token:
