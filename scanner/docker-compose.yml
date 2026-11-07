@@ -1,0 +1,28 @@
+# Developer / private network use only, not a secure public deployment.
+# RTMP broadcast ingest is unencrypted here. Production requires a secured ingest endpoint.
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:1
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "127.0.0.1:1935:1935"
+    restart: unless-stopped
+  detector:
+    build: ./server
+    environment:
+      LASTZ_SCANNER_TOKEN: ${LASTZ_SCANNER_TOKEN:?Set token in shell environment}
+    ports:
+      - "127.0.0.1:8765:8765"
+    restart: unless-stopped
+  worker:
+    build: ./server
+    command: ["python", "stream_worker.py"]
+    environment:
+      LASTZ_SCANNER_TOKEN: ${LASTZ_SCANNER_TOKEN:?Set token in shell environment}
+      LASTZ_STATE: ${LASTZ_STATE:-406}
+      STREAM_URL: rtsp://mediamtx:8554/lastz
+      SCANNER_API_URL: http://detector:8765/v1/frames
+      SAMPLE_INTERVAL: "1.0"
+    depends_on: [mediamtx, detector]
+    restart: unless-stopped
