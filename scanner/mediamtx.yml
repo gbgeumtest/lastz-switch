@@ -1,0 +1,13 @@
+# MediaMTX stream receiver. Keep the ingest private; do NOT publish this as an unauthenticated public server.
+logLevel: warn
+rtsp: true
+rtspAddress: :8554
+rtmp: true
+rtmpAddress: :1935
+hls: false
+webrtc: false
+api: false
+metrics: false
+paths:
+  lastz:
+    source: publisher
