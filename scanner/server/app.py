@@ -83,6 +83,8 @@ async def accept_frame(
     if frame is None:
         raise HTTPException(status_code=400, detail="invalid_image")
     candidates = detect_yellow_candidates(frame)
+    # A color-only image filter cannot reliably classify blue-chest bounty quests.
+    # Until trained detection + OCR is validated, never publish unverified bounty hits.
     recorded = datetime.now(timezone.utc).isoformat()
     with GUARD:
         for box in candidates:
