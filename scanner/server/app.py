@@ -16,8 +16,15 @@ from uuid import uuid4
 import cv2
 import numpy as np
 from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Last Z scanner prototype", docs_url=None, redoc_url=None)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://gbgeumtest.github.io"],
+    allow_methods=["GET"],
+    allow_headers=["Authorization"],
+)
 EVENTS = deque(maxlen=200)
 GUARD = Lock()
 MAX_FRAME_BYTES = 1_500_000
