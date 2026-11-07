@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>GB YS · Last Z Scanner</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--card:#171d2c;--line:#303b55;--muted:#9ba6bc;--blue:#3d74ff;--green:#65dc8d;--amber:#f2c25c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:520px;margin:auto;padding:20px 18px calc(32px + env(safe-area-inset-bottom))}
+h1{font-size:26px;margin:0 0 4px}.sub,.hint{color:var(--muted);font-size:13px;line-height:1.6}
+nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:17px 0}
+a.nav{display:block;margin:0;text-decoration:none;text-align:center;color:#fff;padding:12px;border-radius:12px;background:#1c2435;border:1px solid var(--line);font-weight:700}
+a.nav.active{background:#263b65;border-color:#587eae}
+.card{padding:16px;margin:12px 0;border-radius:16px;background:var(--card);border:1px solid #273348}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 7px}
+input{width:100%;padding:13px;border-radius:10px;background:#0f1522;border:1px solid var(--line);color:#fff;font-size:16px}
+button{font:inherit;border-radius:12px;padding:12px;border:1px solid var(--line);color:#fff;background:#243249;cursor:pointer}
+button.primary{background:var(--blue);border-color:#597ff7}
+button:disabled{opacity:.5;cursor:default}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.pills{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pill{padding:14px;border:1px solid var(--line);border-radius:12px;background:#111a2a}
+.pill b{display:block;margin-bottom:5px}
+small{color:var(--muted);line-height:1.5}
+.state{display:flex;align-items:center;gap:8px;font-weight:750}
+.dot{width:9px;height:9px;border-radius:50%;background:#8791a5}
+.dot.good{background:var(--green)}.dot.warn{background:var(--amber)}
+.events{list-style:none;margin:0;padding:0}
+.events li{padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+.events li span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.note{padding:12px;border-radius:12px;border:1px solid #786331;background:#393018;color:#f6dfa4;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+<h1>LAST Z SCANNER</h1>
+<div class="sub">GB YS · 계정전환 통합 관리 화면</div>
+<nav><a class="nav" href="./index.html">계정 전환</a><a class="nav active" href="./scanner.html" aria-current="page">실시간 스캐너</a></nav>
+<div class="note">현재 iPhone 게임 화면 수집기는 미설치 상태입니다. 이 웹페이지만 켜서는 Last Z 화면을 읽거나 게임을 자동 조작할 수 없습니다. 연결되지 않은 상태를 실제 검색 성공으로 표시하지 않습니다.</div>
+<section class="card">
+ <div class="state"><span class="dot" id="dot"></span><span id="connectionState">수집기 미연결</span></div>
+ <p class="hint" id="detail">연결할 전용 스캐너 서버 주소를 설정하세요. 기존 OTP 메일 서버와 분리됩니다.</p>
+ <label for="stateInput">게임 서버 (State)</label>
+ <input id="stateInput" inputmode="numeric" pattern="[0-9]*" maxlength="5" value="406">
+ <label for="endpoint">스캐너 서버 HTTPS 주소</label>
+ <input id="endpoint" type="url" placeholder="https://scanner.example.com" autocomplete="off" autocapitalize="off">
+ <label for="token">스캐너 서버 전용 인증 토큰</label>
+ <input id="token" type="password" autocomplete="off" placeholder="스캐너 전용 토큰 (OTP 키 아님)">
+ <div class="actions">
+  <button id="save" class="primary">설정 저장</button>
+  <button id="connect">연결 확인</button>
+ </div>
+ <p class="hint">전용 서버가 배포되어야 연결할 수 있습니다. 임의 주소나 메일 인증 키를 입력하지 마세요.</p>
+</section>
+<section class="card">
+ <div class="pills">
+  <div class="pill"><b>🚚 S급 트럭</b><small>노란색 이동 트럭 · 현재 후보 탐지 연구 단계</small></div>
+  <div class="pill"><b>📦 물자받기</b><small>파란 상자 + 레벨 5 이상 · AI 판별 미구현</small></div>
+ </div>
+</section>
+<section class="card">
+ <div class="state">최근 발견 후보</div>
+ <p class="hint">실시간 수집기가 서버에 연결되어야 표시됩니다. 후보는 게임에서 직접 검증해야 합니다.</p>
+ <ul class="events" id="events"><li>탐지 데이터 없음<span>화면 수집 미연결</span></li></ul>
+ <button id="refresh" style="width:100%">결과 새로고침</button>
+</section>
+<section class="card">
+ <b>세컨 계정 DM 공유</b>
+ <p class="hint">발견한 대상을 게임에서 직접 누르고 공유 → 세컨 계정 선택으로 전송합니다. iOS 웹앱에서는 게임 내 DM을 자동으로 보낼 수 없습니다.</p>
+ <button id="game" style="width:100%">Last Z 열기</button>
+</section>
+</main>
+<script>
+"use strict";
+const byId=id=>document.getElementById(id);
+const storageKey="lastzScannerSettingsV1";
+let timer=null;
+function status(connected, message, detail){
+ byId("dot").className="dot"+(connected?" good":"");
+ byId("connectionState").textContent=message;
+ byId("detail").textContent=detail;
+}
+function config(){
+ const endpoint=byId("endpoint").value.trim().replace(/\/+$/,"");
+ const state=byId("stateInput").value.trim();
+ const token=byId("token").value;
+ if(!/^https:\/\/[^\s/]+/i.test(endpoint) || !/^\d{1,5}$/.test(state)||!token) return null;
+ return {endpoint,state,token};
+}
+function save(){
+ const c=config();
+ if(!c){status(false,"입력 확인 필요","HTTPS 주소, 서버 번호(숫자), 전용 토큰을 확인하세요.");return;}
+ // Token is session-only. Never store it in localStorage or GitHub.
+ localStorage.setItem(storageKey,JSON.stringify({endpoint:c.endpoint,state:c.state}));
+ status(false,"설정 저장됨","접속 토큰은 이 페이지를 닫으면 지워집니다. 연결을 확인해 주세요.");
+}
+function load(){
+ try{const c=JSON.parse(localStorage.getItem(storageKey)||"{}");if(c.endpoint)byId("endpoint").value=c.endpoint;if(c.state)byId("stateInput").value=c.state;}catch{}
+}
+async function request(path){
+ const c=config();
+ if(!c){status(false,"설정 필요","HTTPS 주소, 서버 번호, 인증 토큰을 모두 입력하세요.");return null;}
+ const ctrl=new AbortController();
+ const to=setTimeout(()=>ctrl.abort(),8000);
+ try{
+  const res=await fetch(c.endpoint+path,{headers:{Authorization:"Bearer "+c.token},cache:"no-store",signal:ctrl.signal});
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  return await res.json();
+ }catch(e){status(false,"수집기 연결 실패","서버 미배포, 주소·인증 키 오류 또는 CORS 제한일 수 있습니다. "+e.message);return null;}
+ finally{clearTimeout(to);}
+}
+async function connect(){
+ const data=await request("/v1/events");
+ if(data&&Array.isArray(data.events)){status(true,"분석 서버 연결됨","서버 응답 확인. 실제 게임 화면 수집과 AI 정확도는 별도로 검증해야 합니다.");render(data.events);}
+}
+function render(items){
+ const root=byId("events");root.replaceChildren();
+ const state=byId("stateInput").value.trim();
+ const selected=items.filter(x=>String(x.state)===state).slice(0,30);
+ if(!selected.length){const li=document.createElement("li");li.textContent="해당 서버의 발견 후보 없음";root.appendChild(li);return;}
+ for(const item of selected){
+  const li=document.createElement("li");
+  const kind=item.kind==="yellow_truck_candidate"?"노란 트럭 후보":String(item.kind||"미분류");
+  li.textContent=kind+" · 서버 "+String(item.state);
+  const secondary=document.createElement("span");secondary.textContent=String(item.detectedAt||"")+" · 미검증 후보";li.appendChild(secondary);root.appendChild(li);
+ }
+}
+byId("save").addEventListener("click",save);
+byId("connect").addEventListener("click",connect);
+byId("refresh").addEventListener("click",connect);
+byId("game").addEventListener("click",()=>{location.href=localStorage.getItem("lastz")||"https://apps.apple.com/kr/app/id6503272652";});
+load();
+</script>
+</body></html>
