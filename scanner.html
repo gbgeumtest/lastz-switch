@@ -38,14 +38,14 @@ small{color:var(--muted);line-height:1.5}
 <h1>LAST Z SCANNER</h1>
 <div class="sub">GB YS · 계정전환 통합 관리 화면</div>
 <nav><a class="nav" href="./index.html">계정 전환</a><a class="nav active" href="./scanner.html" aria-current="page">실시간 스캐너</a></nav>
-<div class="note">현재 iPhone 게임 화면 수집기는 미설치 상태입니다. 이 웹페이지만 켜서는 Last Z 화면을 읽거나 게임을 자동 조작할 수 없습니다. 연결되지 않은 상태를 실제 검색 성공으로 표시하지 않습니다.</div>
+<div class="note">현재 iPhone 게임 화면 수집기는 미연결 상태입니다. 이 웹페이지만 켜서는 Last Z 화면을 읽거나 게임을 자동 조작할 수 없습니다. 연결되지 않은 상태를 실제 검색 성공으로 표시하지 않습니다.</div>
 <section class="card">
  <div class="state"><span class="dot" id="dot"></span><span id="connectionState">수집기 미연결</span></div>
  <p class="hint" id="detail">연결할 전용 스캐너 서버 주소를 설정하세요. 기존 OTP 메일 서버와 분리됩니다.</p>
  <label for="stateInput">게임 서버 (State)</label>
  <input id="stateInput" inputmode="numeric" pattern="[0-9]*" maxlength="5" value="406">
- <details id="advanced"><summary style="cursor:pointer;padding:12px;border:1px solid #303b55;border-radius:10px;margin-top:12px">개발자 설정 · 화면 수집 서버 연결</summary><p class="hint">아직 실제 수신 서버가 배포되지 않았습니다. 서버 주소와 토큰은 설치 및 배포가 완료된 후에만 입력합니다.</p><label for="endpoint">스캐너 서버 HTTPS 주소</label>
- <input id="endpoint" type="url" placeholder="https://scanner.example.com" autocomplete="off" autocapitalize="off">
+ <details id="advanced"><summary style="cursor:pointer;padding:12px;border:1px solid #303b55;border-radius:10px;margin-top:12px">개발자 설정 · 화면 수집 서버 연결</summary><p class="hint">아직 실제 수신 서버가 배포되지 않았습니다. 전용 분석 서버는 배포 중입니다. 서버가 실행되어도 게임 화면을 송출하지 않으면 실시간 탐지는 작동하지 않습니다.</p><label for="endpoint">스캐너 서버 HTTPS 주소</label>
+ <input id="endpoint" type="url" value="https://lastz-live-scanner-api.onrender.com" placeholder="https://lastz-live-scanner-api.onrender.com" autocomplete="off" autocapitalize="off">
  <label for="token">스캐너 서버 전용 인증 토큰</label>
  <input id="token" type="password" autocomplete="off" placeholder="스캐너 전용 토큰 (OTP 키 아님)">
  <div class="actions">
