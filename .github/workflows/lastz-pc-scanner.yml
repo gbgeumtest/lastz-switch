@@ -5,6 +5,10 @@ on:
     paths:
       - "pc-scanner/**"
       - ".github/workflows/lastz-pc-scanner.yml"
+  pull_request:
+    paths:
+      - "pc-scanner/**"
+      - ".github/workflows/lastz-pc-scanner.yml"
   workflow_dispatch:
 jobs:
   windows-exe:
