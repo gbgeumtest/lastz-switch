@@ -41,6 +41,7 @@ small{color:var(--muted);line-height:1.5}
 <div class="note">현재 iPhone 게임 화면 수집기는 미연결 상태입니다. 이 웹페이지만 켜서는 Last Z 화면을 읽거나 게임을 자동 조작할 수 없습니다. 연결되지 않은 상태를 실제 검색 성공으로 표시하지 않습니다.</div>
 <section class="card">
  <div class="state"><span class="dot" id="dot"></span><span id="connectionState">수집기 미연결</span></div>
+ <p class="hint" id="healthStatus">분석 서버 상태 확인 중</p>
  <p class="hint" id="detail">연결할 전용 스캐너 서버 주소를 설정하세요. 기존 OTP 메일 서버와 분리됩니다.</p>
  <label for="stateInput">게임 서버 (State)</label>
  <input id="stateInput" inputmode="numeric" pattern="[0-9]*" maxlength="5" value="406">
@@ -131,6 +132,20 @@ byId("save").addEventListener("click",save);
 byId("connect").addEventListener("click",connect);
 byId("refresh").addEventListener("click",connect);
 byId("game").addEventListener("click",()=>{location.href=localStorage.getItem("lastz")||"https://apps.apple.com/kr/app/id6503272652";});
+async function healthCheck(){
+ const label=byId("healthStatus");
+ try{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),12000);
+  const response=await fetch("https://lastz-live-scanner-api.onrender.com/health",{cache:"no-store",signal:controller.signal});
+  clearTimeout(timeout);
+  const result=await response.json();
+  label.textContent=(response.ok&&result.ok)?"분석 API 온라인 · 게임 화면 수집은 미연결":"분석 API 응답 오류";
+ }catch{
+  label.textContent="분석 API 연결 확인 실패 · 게임 화면 수집은 미연결";
+ }
+}
+healthCheck();
 load();
 </script>
 </body></html>
